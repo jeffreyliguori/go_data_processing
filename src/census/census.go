@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path"
-	"strconv"
 )
 
 type Demographic struct {
@@ -32,9 +31,9 @@ type Demographic struct {
 	HispanicWomen float64 `json:"hispanic_women"`
 }
 
-func GetPerCountyDataForCounty(year, ageGroup, county int, dir string) (Demographic, error) {
-	pathSprintf := path.Join(dir, "%d", "%d", "%d.json")
-	path := fmt.Sprintf(pathSprintf, year, county, ageGroup)
+func GetPerCountyDataForCounty(year, ageGroup int, county, dir string) (Demographic, error) {
+	pathSprintf := path.Join(dir, "%d", county, "%d.json")
+	path := fmt.Sprintf(pathSprintf, year, ageGroup)
 	contents, err := ioutil.ReadFile(path)
 	if err != nil {
 		return Demographic{}, err
@@ -52,11 +51,7 @@ func GetPerCountyDataFor(year, ageGroup int, dir string) ([]Demographic, error) 
 		return d, err
 	}
 	for _, file := range files {
-		county, err := strconv.Atoi(file.Name())
-		if err != nil {
-			return d, err
-		}
-		data, err := GetPerCountyDataForCounty(year, ageGroup, county, dir)
+		data, err := GetPerCountyDataForCounty(year, ageGroup, file.Name(), dir)
 		if err != nil {
 			return d, err
 		}
